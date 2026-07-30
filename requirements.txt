@@ -1,0 +1,16 @@
+langchain
+langgraph
+langchain-openai
+langchain-community
+
+streamlit
+
+chromadb
+
+pypdf
+
+python-dotenv
+
+wikipedia
+
+tiktoken

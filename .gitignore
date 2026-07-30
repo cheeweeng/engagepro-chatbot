@@ -1,0 +1,43 @@
+# ----------------------------
+# Python
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ----------------------------
+# Virtual environments
+# ----------------------------
+.venv/
+venv/
+env/
+
+# Conda
+.envs/
+
+# ----------------------------
+# Environment variables
+# ----------------------------
+.env
+
+# ----------------------------
+# Streamlit
+# ----------------------------
+.streamlit/secrets.toml
+
+# ----------------------------
+# Chroma Vector Database
+# Keeping it out of Git avoids committing generated artefacts.
+# ----------------------------
+vectorstore/
+
+# ----------------------------
+# VS Code
+# ----------------------------
+.vscode/
+
+# ----------------------------
+# OS files
+# ----------------------------
+.DS_Store
+Thumbs.db
