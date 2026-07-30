@@ -555,28 +555,375 @@ Rather than relying on the language model's internal knowledge, the chatbot retr
 
 # Architecture Decisions (ADR)
 
-(To be completed)
+# Architecture Decisions (ADR)
+
+---
+
+## ADR-001: Adopt LangGraph as the Workflow Framework
+
+### Status
+
+Accepted
+
+### Decision
+
+Use LangGraph to orchestrate the chatbot workflow.
+
+### Context
+
+The project required multiple processing stages, including question routing, Retrieval-Augmented Generation (RAG), and Wikipedia retrieval. A workflow framework was needed to coordinate these components while remaining modular and extensible.
+
+### Alternatives Considered
+
+- Sequential Python function calls
+- LangChain Chains
+- LangGraph
+
+### Rationale
+
+LangGraph provides a graph-based workflow that cleanly separates individual processing nodes while supporting conditional routing. This architecture improves maintainability and allows additional processing branches to be added in future with minimal code changes.
+
+### Consequences
+
+- Clear separation of responsibilities.
+- Modular workflow design.
+- Easier future expansion.
+
+---
+
+## ADR-002: Use Retrieval-Augmented Generation (RAG) for EngagePro Knowledge
+
+### Status
+
+Accepted
+
+### Decision
+
+Use Retrieval-Augmented Generation instead of relying solely on the language model's internal knowledge.
+
+### Context
+
+The chatbot must answer questions specifically about EngagePro using information contained in the provided company brochure.
+
+### Alternatives Considered
+
+- Prompt the LLM with the entire brochure.
+- Fine-tune an LLM.
+- Retrieval-Augmented Generation (RAG).
+
+### Rationale
+
+RAG retrieves only the most relevant document chunks for each user question, reducing context size while improving response accuracy and factual grounding.
+
+### Consequences
+
+- Reduced hallucinations.
+- Better scalability for larger knowledge bases.
+- Efficient prompt construction.
+
+---
+
+## ADR-003: Store Embeddings in ChromaDB
+
+### Status
+
+Accepted
+
+### Decision
+
+Use ChromaDB as the vector database.
+
+### Context
+
+The project required persistent storage of document embeddings to support semantic search.
+
+### Alternatives Considered
+
+- FAISS
+- Pinecone
+- ChromaDB
+
+### Rationale
+
+ChromaDB is lightweight, easy to integrate, open source, and suitable for a local educational project without requiring cloud infrastructure.
+
+### Consequences
+
+- Simple deployment.
+- Persistent local storage.
+- Minimal configuration.
+
+---
+
+## ADR-004: Implement an LLM-Based Routing Agent
+
+### Status
+
+Accepted
+
+### Decision
+
+Introduce a lightweight routing agent to classify user questions before processing.
+
+### Context
+
+The chatbot needed to distinguish between EngagePro-specific questions and general or technical questions.
+
+### Alternatives Considered
+
+- Keyword matching
+- Rule-based routing
+- LLM-based classification
+
+### Rationale
+
+An LLM provides flexible intent classification without maintaining complex keyword lists. Restricting the output to two valid routes (`engagepro` and `general`) improved consistency.
+
+### Consequences
+
+- Improved modularity.
+- Better separation of workflows.
+- Simplified future expansion.
+
+---
+
+## ADR-005: Use Wikipedia as the General Knowledge Source
+
+### Status
+
+Accepted
+
+### Decision
+
+Retrieve general and technical information from Wikipedia before generating responses.
+
+### Context
+
+The assignment required the chatbot to answer general or technical questions using Wikipedia.
+
+### Alternatives Considered
+
+- Use the LLM's internal knowledge.
+- Internet search engines.
+- Wikipedia REST API.
+
+### Rationale
+
+Wikipedia provides a freely accessible, well-known knowledge source. Retrieving information before prompting the LLM helps reduce hallucinations and satisfies the assignment requirements.
+
+### Consequences
+
+- Grounded responses.
+- Improved factual accuracy.
+- Clear separation between company knowledge and public knowledge.
+
+---
+
+## ADR-006: Use Prompt Engineering to Reduce Hallucinations
+
+### Status
+
+Accepted
+
+### Decision
+
+Design separate prompts for RAG and Wikipedia responses.
+
+### Context
+
+The chatbot needed to minimise hallucinations and encourage grounded responses.
+
+### Alternatives Considered
+
+- Single generic prompt.
+- Separate prompts for each knowledge source.
+
+### Rationale
+
+Dedicated prompts allow instructions to be tailored to each retrieval source while encouraging the language model to respond honestly when insufficient information is available.
+
+### Consequences
+
+- Improved response quality.
+- Reduced unsupported answers.
+- Easier prompt maintenance.
 
 ---
 
 # Testing Log
 
-(To be completed)
+# Testing Log
+
+| Test ID | Component | Test Description | Result |
+|---------|-----------|------------------|--------|
+| T01 | PDF Loading | Verify the EngagePro brochure can be loaded successfully. | ✅ Pass |
+| T02 | Document Chunking | Verify the brochure is split into overlapping chunks correctly. | ✅ Pass |
+| T03 | Embeddings | Verify embeddings are generated using the OpenAI embedding model. | ✅ Pass |
+| T04 | ChromaDB | Verify document chunks are indexed into the vector database. | ✅ Pass |
+| T05 | Retrieval | Verify relevant document chunks are retrieved for EngagePro questions. | ✅ Pass |
+| T06 | RAG Prompt | Verify retrieved documents are correctly inserted into the RAG prompt. | ✅ Pass |
+| T07 | Streamlit Interface | Verify the chatbot interface launches and accepts user input. | ✅ Pass |
+| T08 | LangGraph Workflow | Verify the LangGraph workflow executes successfully. | ✅ Pass |
+| T09 | Routing Agent | Verify questions are correctly classified into `engagepro` and `general`. | ✅ Pass |
+| T10 | Conditional Routing | Verify questions are routed to the correct processing node. | ✅ Pass |
+| T11 | Wikipedia Retrieval | Verify Wikipedia summaries are successfully retrieved using the REST API. | ✅ Pass |
+| T12 | End-to-End Integration | Verify the chatbot answers both EngagePro-specific and general questions correctly. | ✅ Pass |
+
+## Functional Test Cases
+
+### EngagePro Knowledge (RAG)
+
+| Question | Expected Result | Status |
+|----------|-----------------|--------|
+| What is EngagePro's mission? | Answer generated from brochure | ✅ |
+| What products does EngagePro provide? | Answer generated from brochure | ✅ |
+| Where is EngagePro located? | Correct location returned | ✅ |
+
+---
+
+### Wikipedia Knowledge
+
+| Question | Expected Result | Status |
+|----------|-----------------|--------|
+| What is Artificial Intelligence? | Wikipedia-based response | ✅ |
+| Explain Retrieval-Augmented Generation. | Wikipedia-based response | ✅ |
+| What is LangChain? | Wikipedia-based response | ✅ |
+
+---
+
+### Routing
+
+| Question | Expected Route | Status |
+|----------|----------------|--------|
+| What is EngagePro's mission? | RAG | ✅ |
+| Explain Artificial Intelligence. | Wikipedia | ✅ |
+| What services does EngagePro offer? | RAG | ✅ |
+| Explain Retrieval-Augmented Generation. | Wikipedia | ✅ |
 
 ---
 
 # Lessons Learned
 
-(To be completed)
+# Lessons Learned
+
+Throughout the development of the EngagePro Chatbot, several important technical and software engineering lessons were learned.
+
+## 1. Incremental Development Simplifies Complex Projects
+
+Developing the chatbot in small, testable iterations made debugging significantly easier. Each component was implemented and validated independently before integration into the complete system.
+
+---
+
+## 2. Modular Architecture Improves Maintainability
+
+Separating the project into dedicated modules (RAG, routing, prompts, Wikipedia retrieval, LangGraph workflow, and user interface) made the codebase easier to understand, maintain, and extend.
+
+---
+
+## 3. Retrieval-Augmented Generation Produces More Reliable Responses
+
+Using Retrieval-Augmented Generation (RAG) enabled the chatbot to answer EngagePro-specific questions using information retrieved directly from the company brochure rather than relying solely on the language model's internal knowledge. This reduced hallucinations and improved response accuracy.
+
+---
+
+## 4. Prompt Engineering Has a Significant Impact
+
+Carefully designed prompts greatly improved response quality. Separate prompts for EngagePro knowledge and Wikipedia retrieval encouraged the language model to generate grounded responses and acknowledge when sufficient information was unavailable.
+
+---
+
+## 5. Workflow Orchestration Simplifies Complex Logic
+
+LangGraph provided a clear mechanism for organising the chatbot workflow. The routing node, RAG node, and Wikipedia node each had distinct responsibilities, resulting in a clean and extensible architecture.
+
+---
+
+## 6. Systematic Testing Improves Reliability
+
+Testing each module independently before integrating it into the complete application helped identify issues early. Dedicated test scripts simplified debugging and increased confidence in the final implementation.
+
+---
+
+## 7. Git Version Control Supports Incremental Development
+
+Using Git commits and version tags throughout the project provided clear development milestones and made it easier to track progress and maintain a stable codebase.
+
+---
+
+## 8. AI-Assisted Development Accelerates Learning
+
+ChatGPT served as a technical mentor and learning companion throughout the project by explaining concepts, reviewing architecture, assisting with debugging, and discussing design alternatives. This iterative collaboration improved both the quality of the implementation and the author's understanding of Retrieval-Augmented Generation, LangGraph, prompt engineering, and modern LLM application development.
 
 ---
 
 # Presentation Notes
 
-(To be completed)
+## Demonstration Flow
+
+The live demonstration will follow the chatbot's workflow from user input to response generation:
+
+1. Introduce the project objective.
+2. Explain the overall system architecture.
+3. Demonstrate an EngagePro-specific query using RAG.
+4. Demonstrate a general knowledge query using Wikipedia retrieval.
+5. Explain the routing agent and LangGraph workflow.
+6. Summarise key engineering decisions and future improvements.
+
+## Key Points
+
+- Demonstrate both chatbot knowledge sources.
+- Explain how the routing agent selects the appropriate workflow.
+- Highlight prompt engineering techniques used to reduce hallucinations.
+- Emphasise the modular architecture and incremental development approach.
 
 ---
 
 # Future Improvements
 
-(To be completed)
+Although the chatbot satisfies the assignment requirements, several enhancements could further improve its capabilities and usability.
+
+## 1. Support Multiple Knowledge Sources
+
+Extend the RAG pipeline to index multiple company documents instead of relying on a single brochure. This would enable the chatbot to answer a wider range of business-related questions.
+
+---
+
+## 2. Source Citation
+
+Display the document source and page number used to generate each RAG response. This would improve transparency and allow users to verify the information provided.
+
+---
+
+## 3. Persistent Conversation History
+
+Store conversation history in a database so that users can resume previous chat sessions across multiple visits.
+
+---
+
+## 4. Additional Knowledge Sources
+
+Integrate other trusted external knowledge sources, such as company documentation or enterprise knowledge bases, alongside Wikipedia.
+
+---
+
+## 5. Enhanced User Authentication
+
+Introduce user authentication and role-based access control to support personalised experiences and protect sensitive company information.
+
+---
+
+## 6. Containerised Deployment
+
+Package the chatbot using Docker to simplify deployment and improve portability across different environments.
+
+---
+
+## 7. Cloud Deployment
+
+Deploy the chatbot to a cloud platform such as Microsoft Azure, AWS, or Google Cloud Platform to improve scalability and availability.
+
+---
+
+## 8. Continuous Evaluation
+
+Introduce automated evaluation metrics to monitor response quality, retrieval accuracy, and user satisfaction over time.
