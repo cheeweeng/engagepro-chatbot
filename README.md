@@ -168,7 +168,7 @@ streamlit run app.py
 
 ## Development Journey
 
-The project was developed incrementally through multiple iterations:
+The project was developed incrementally with ChatGPT acting as a technical mentor and learning companion throughout the software development lifecycle. Each iteration focused on a single component, allowing features to be implemented, tested, and integrated systematically.
 
 1. Assignment Analysis
 2. System Architecture
