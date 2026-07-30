@@ -443,7 +443,7 @@ Implement a lightweight routing agent that classifies user questions before they
 - Separated routing logic into its own module to keep the LangGraph nodes focused on orchestration.
 
 ### Engineering Rationale
-A lightweight routing agent improves the chatbot's usability by ensuring that only EngagePro-related questions are sent through the RAG workflow. General knowledge questions can later be routed directly to the language model. This demonstrates the use of an agent without introducing unnecessary complexity.
+A lightweight routing agent improves the chatbot's usability by ensuring that only EngagePro-related questions are sent through the RAG workflow. General and technical questions can be routed to an independent processing branch. This architecture enables EngagePro-specific questions to use Retrieval-Augmented Generation (RAG), while general knowledge questions are answered using information retrieved from Wikipedia. The routing agent demonstrates the use of an LLM-based agent without introducing unnecessary complexity.
 
 ### Testing
 
@@ -454,6 +454,100 @@ A lightweight routing agent improves the chatbot's usability by ensuring that on
 - LLMs can perform reliable intent classification using carefully designed prompts.
 - Restricting the classifier to two valid outputs improved consistency.
 - Separating routing from response generation follows the Single Responsibility Principle and simplifies the LangGraph workflow.
+
+### Status
+
+✅ Completed
+
+## Iteration 5.2 – Conditional Workflow Routing
+
+### Objective
+
+Integrate the routing agent into the LangGraph workflow so that EngagePro-related questions are processed using Retrieval-Augmented Generation (RAG), while general and technical questions are routed to a separate processing branch.
+
+### Files Modified
+
+- graph/workflow.py
+- graph/nodes.py
+- graph/state.py
+- scripts/test_graph.py
+
+### Key Design Decisions
+
+- Used LangGraph conditional edges to implement dynamic routing.
+- Added a `route` field to `ChatState` to store the routing decision.
+- Split the chatbot into two independent processing nodes:
+  - `rag_chat_node()`
+  - `general_chat_node()`
+- Kept the router responsible only for classification to maintain separation of concerns.
+
+### Engineering Rationale
+
+The chatbot architecture was redesigned to follow a modular workflow. Rather than allowing every question to follow the same execution path, the routing agent first determines the question type before directing it to the appropriate processing node. This improves scalability and allows additional routes to be added in future without modifying the existing nodes.
+
+### Testing
+
+✅ LangGraph workflow compiled successfully.
+
+✅ EngagePro questions routed to the RAG branch.
+
+✅ General questions routed to the general knowledge branch.
+
+### Lessons Learned
+
+- LangGraph conditional routing simplifies complex workflows.
+- Keeping routing logic separate from response generation improves maintainability.
+- Modular node design makes the workflow easier to extend.
+
+### Status
+
+✅ Completed
+
+## Iteration 5.3 – Wikipedia Integration
+
+### Objective
+
+Implement Wikipedia search for general and technical questions to satisfy the assignment requirement that the chatbot retrieve factual information from Wikipedia before generating a response.
+
+### Files Created
+
+- wiki/__init__.py
+- wiki/wikipedia_search.py
+- prompts/wiki_prompt.py
+- scripts/test_wikipedia.py
+
+### Files Modified
+
+- graph/nodes.py
+- requirements.txt
+
+### Key Design Decisions
+
+- Used the official Wikipedia REST API instead of a third-party wrapper library.
+- Added a query preprocessing function (`clean_query()`) to convert natural-language questions into effective Wikipedia search queries.
+- Introduced a dedicated Wikipedia prompt builder to ensure responses were grounded only in retrieved information.
+- Continued using GPT to summarise and present Wikipedia content conversationally.
+
+### Engineering Rationale
+
+Rather than relying on the language model's internal knowledge, the chatbot retrieves relevant Wikipedia information first and uses it as context for response generation. This reduces hallucinations, improves factual grounding, and satisfies the assignment requirement for Wikipedia-based knowledge retrieval while preserving the modular LangGraph architecture.
+
+### Testing
+
+✅ Wikipedia REST API successfully retrieved article summaries.
+
+✅ Query preprocessing improved search accuracy for natural-language questions.
+
+✅ General and technical questions were correctly answered using Wikipedia.
+
+✅ End-to-end Streamlit testing confirmed successful routing between RAG and Wikipedia branches.
+
+### Lessons Learned
+
+- Official REST APIs are often more reliable than older wrapper libraries.
+- Natural-language queries should be preprocessed before performing information retrieval.
+- Prompt engineering plays an important role in ensuring grounded responses and reducing hallucinations.
+- Separating retrieval, prompt construction, and response generation improves maintainability and readability.
 
 ### Status
 

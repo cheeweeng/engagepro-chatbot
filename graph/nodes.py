@@ -10,6 +10,11 @@ from llm.llm_factory import get_llm
 from rag.retrieval import retrieve_documents
 from prompts.rag_prompt import build_rag_prompt
 
+from routing.router import classify_question
+
+from wiki.wikipedia_search import retrieve_wikipedia_summary
+from prompts.wiki_prompt import build_wiki_prompt
+
 # ===========================
 # RAG Node
 # ===========================
@@ -50,12 +55,25 @@ def rag_chat_node(state: ChatState) -> ChatState:
 
 def general_chat_node(state: ChatState) -> ChatState:
     """
-    Handle general knowledge questions using the LLM only.
+    Answer general and technical questions using Wikipedia.
     """
 
     llm = get_llm()
 
-    response = llm.invoke(state["messages"])
+    # Latest user question
+    question = state["messages"][-1].content
+
+    # Search Wikipedia
+    wikipedia_summary = retrieve_wikipedia_summary(question)
+
+    # Build the prompt
+    prompt = build_wiki_prompt(
+        question=question,
+        wikipedia_summary=wikipedia_summary,
+    )
+
+    # Ask the LLM
+    response = llm.invoke(prompt)
 
     return {
         "messages": [
@@ -67,7 +85,7 @@ def general_chat_node(state: ChatState) -> ChatState:
 # Routing Node
 # ==========================================================
 
-from routing.router import classify_question
+
 
 
 def routing_node(state: ChatState) -> ChatState:

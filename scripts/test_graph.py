@@ -5,7 +5,7 @@ from graph.workflow import graph
 response = graph.invoke(
     {
         "messages": [
-            HumanMessage(content="What is LangGraph?")
+            HumanMessage(content="What is artificial intelligence?")
         ]
     }
 )
