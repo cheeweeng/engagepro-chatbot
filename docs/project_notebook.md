@@ -427,6 +427,38 @@ Rather than adding additional LangGraph nodes, retrieval was integrated into the
 
 ✅ Completed
 
+## Iteration 5.1 – Lightweight Routing Agent
+
+### Objective
+Implement a lightweight routing agent that classifies user questions before they are processed by the chatbot.
+
+### Files Created
+- routing/router.py
+- routing/__init__.py
+- scripts/test_router.py
+
+### Key Design Decisions
+- Used the existing GPT model as an intent classifier.
+- Restricted the classifier to two outputs: `engagepro` and `general`.
+- Separated routing logic into its own module to keep the LangGraph nodes focused on orchestration.
+
+### Engineering Rationale
+A lightweight routing agent improves the chatbot's usability by ensuring that only EngagePro-related questions are sent through the RAG workflow. General knowledge questions can later be routed directly to the language model. This demonstrates the use of an agent without introducing unnecessary complexity.
+
+### Testing
+
+✅ Routing agent correctly classified all evaluation questions.
+
+### Lessons Learned
+
+- LLMs can perform reliable intent classification using carefully designed prompts.
+- Restricting the classifier to two valid outputs improved consistency.
+- Separating routing from response generation follows the Single Responsibility Principle and simplifies the LangGraph workflow.
+
+### Status
+
+✅ Completed
+
 # Architecture Decisions (ADR)
 
 (To be completed)
