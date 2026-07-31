@@ -41,3 +41,5 @@ vectorstore/
 # ----------------------------
 .DS_Store
 Thumbs.db
+
+submission/

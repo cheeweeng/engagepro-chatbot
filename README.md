@@ -31,58 +31,63 @@ The chatbot combines:
 - Wikipedia integration for general knowledge
 - Conversation history using LangGraph `MessagesState`
 - Prompt engineering to minimise hallucinations
+- Responsible AI guardrails implemented using a dedicated LangGraph Safety Node.
 
 ---
 
 ## System Architecture
 
 ```
-                    User
-                      │
-                      ▼
-                Streamlit UI
-                      │
-                      ▼
-              LangGraph Workflow
-                      │
-                      ▼
-              Routing Agent (LLM)
-               /              \
-              /                \
-             ▼                  ▼
-     EngagePro Questions   General Questions
-             │                  │
-             ▼                  ▼
-        ChromaDB (RAG)     Wikipedia API
-             │                  │
-             ▼                  ▼
-       Prompt Builder     Prompt Builder
-             └────────────┬────────────┘
-                          ▼
-                       GPT-4.1
-                          ▼
-                    Final Response
+                         User
+                           │
+                           ▼
+                     Streamlit UI
+                           │
+                           ▼
+                   LangGraph Workflow
+                           │
+                           ▼
+                  Safety Guardrail (GPT Classifier)
+                    ┌────────┴────────┐
+                    │                 │
+                    ▼                 ▼
+             Blocked Response    Routing Agent (GPT Classifier)
+                                      │
+                          ┌───────────┴───────────┐
+                          ▼                       ▼
+                EngagePro Questions      General Questions
+                          │                       │
+                          ▼                       ▼
+                    ChromaDB (RAG)         Wikipedia API
+                          │                       │
+                          ▼                       ▼
+                   Prompt Builder         Prompt Builder
+                          └───────────────┬───────────────┘
+                                          ▼
+                                       GPT-4.1
+                                          │
+                                          ▼
+                                    Final Response
 ```
-
 ---
 
 ## Project Structure
-
 ```
 engagepro_chatbot/
 │
-├── app.py
-├── config.py
-├── graph/
-├── llm/
-├── prompts/
-├── rag/
-├── routing/
-├── wiki/
-├── scripts/
-├── tests/
-├── docs/
-├── data/
+├── app.py # Streamlit application
+├── config.py # Configuration
+├── graph/ # LangGraph workflow and nodes
+├── guardrails/ # Safety classifier
+├── llm/ # LLM factory
+├── prompts/ # Prompt templates
+├── rag/ # RAG pipeline and ChromaDB retrieval
+├── routing/ # Question routing agent
+├── wiki/ # Wikipedia retrieval
+├── scripts/ # Development and testing scripts
+├── tests/ # Unit tests
+├── docs/ # Project documentation
+├── data/ # Brochure and vector database
 └── requirements.txt
 ```
 

@@ -14,3 +14,4 @@ class ChatState(MessagesState):
     """
 
     route: str = ""
+    safety: str = ""

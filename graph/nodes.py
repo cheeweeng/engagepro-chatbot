@@ -15,6 +15,8 @@ from routing.router import classify_question
 from wiki.wikipedia_search import retrieve_wikipedia_summary
 from prompts.wiki_prompt import build_wiki_prompt
 
+from guardrails.safety import classify_safety
+
 # ===========================
 # RAG Node
 # ===========================
@@ -52,7 +54,6 @@ def rag_chat_node(state: ChatState) -> ChatState:
 # General Chat Node
 # ===========================
 
-
 def general_chat_node(state: ChatState) -> ChatState:
     """
     Answer general and technical questions using Wikipedia.
@@ -81,12 +82,49 @@ def general_chat_node(state: ChatState) -> ChatState:
         ]
     }
 
+# ===========================
+# Safety Node
+# ===========================
+
+def safety_node(state: ChatState) -> ChatState:
+    """
+    Classify whether the user's question is safe.
+    """
+
+    question = state["messages"][-1].content
+
+    safety = classify_safety(question)
+
+    return {
+        "safety": safety
+    }
+
+# ===========================
+# Blocked Node
+# ===========================
+
+def blocked_node(state: ChatState) -> ChatState:
+    """
+    Return a response for blocked questions.
+    """
+
+    return {
+        "messages": [
+            AIMessage(
+                content=(
+                    "I'm sorry, but I cannot assist with requests involving "
+                    "politics, religion, hate speech, racism, discrimination,"
+                    "abusive language, or explicit sexual content.\n\n"
+                    "Please ask a question about EngagePro or another "
+                    "general educational topic."
+                )
+            )
+        ]
+    }
+
 # ==========================================================
 # Routing Node
 # ==========================================================
-
-
-
 
 def routing_node(state: ChatState) -> ChatState:
     """

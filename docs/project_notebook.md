@@ -553,7 +553,51 @@ Rather than relying on the language model's internal knowledge, the chatbot retr
 
 ✅ Completed
 
-# Architecture Decisions (ADR)
+## Iteration 6.1 – Responsible AI Guardrails
+
+### Objective
+
+Introduce a safety layer that blocks inappropriate or sensitive user requests before they reach the routing, RAG, or Wikipedia workflows.
+
+### Files Created
+
+- guardrails/safety.py
+- guardrails/__init__.py
+- scripts/test_guardrails.py
+- scripts/test_guardrails_workflow.py
+
+### Files Updated
+
+- graph/state.py
+- graph/nodes.py
+- graph/workflow.py
+
+### Key Design Decisions
+
+- Implemented a dedicated Safety Node before the Routing Node.
+- Used a lightweight LLM classifier instead of keyword matching.
+- Kept safety classification independent from routing to follow the Single Responsibility Principle.
+- Returned a predefined response for blocked questions without invoking the LLM.
+
+### Engineering Rationale
+
+Separating safety from routing keeps the chatbot modular and easier to extend. The Safety Node determines whether a request is appropriate, while the Routing Node determines which knowledge source should answer it. This design reflects how production AI systems often place content moderation before downstream processing.
+
+### Testing
+
+✅ Safe questions continued to reach the correct workflow.
+
+✅ Sensitive questions involving politics, racism, hate speech, abusive language and explicit sexual content were blocked before reaching the routing stage.
+
+### Lessons Learned
+
+- Guardrails are an important aspect of responsible AI.
+- Safety and routing solve different problems and should remain separate.
+- Incremental integration reduced debugging complexity.
+
+### Status
+
+✅ Completed
 
 # Architecture Decisions (ADR)
 
