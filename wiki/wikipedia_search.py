@@ -6,6 +6,8 @@ Uses the official Wikipedia REST API.
 import re
 import requests
 
+# User agent for API requests
+# chatbot identifies itself when making requests to Wikipedia
 USER_AGENT = (
     "EngageProChatbot/1.0 (Ngee Ann Polytechnic LLMA Student Project)"
 )
@@ -44,7 +46,7 @@ def retrieve_wikipedia_summary(query: str) -> str:
         search_response.raise_for_status()
 
         search_results = search_response.json()
-
+        # extract the search hits from the response
         hits = search_results["query"]["search"]
 
         if not hits:
@@ -52,7 +54,7 @@ def retrieve_wikipedia_summary(query: str) -> str:
                 "No relevant Wikipedia article was found for this topic.\n\n"
                 "Do not answer using your own knowledge."
             )
-
+        # select the title of the best matching article
         title = hits[0]["title"]
 
         # print(f"Search query : {query}")
@@ -73,12 +75,12 @@ def retrieve_wikipedia_summary(query: str) -> str:
         summary_response.raise_for_status()
 
         data = summary_response.json()
-
+        # returns the article's summary text
         return data.get(
             "extract",
             "No summary available."
         )
-
+    # handle any exceptions that may occur during the API requests
     except Exception as error:
 
         return f"Wikipedia search failed: {error}"
@@ -87,6 +89,7 @@ def retrieve_wikipedia_summary(query: str) -> str:
 def clean_query(query: str) -> str:
     """
     Convert a natural-language question into a Wikipedia search query.
+    removes common question prefixes & trailing punctuation
     """
 
     query = query.strip()

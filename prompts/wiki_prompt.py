@@ -7,7 +7,7 @@ def build_wiki_prompt(
     wikipedia_summary: str,
 ) -> str:
     """
-    Build a prompt using Wikipedia information.
+    Build a prompt to answer a general question using Wikipedia information.
     """
 
     return f"""

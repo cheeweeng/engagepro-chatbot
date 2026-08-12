@@ -1,6 +1,6 @@
 # EngagePro Chatbot
 
-An AI-powered customer support chatbot developed as part of the **Large Language Model Applications (LLMA)** module at **Ngee Ann Polytechnic**.
+An AI-powered customer support chatbot developed as part of the **Large Language Model Applications (LLMA)** module at **Ngee Ann Polytechnic School of InfoComm Technology**.
 
 The chatbot answers **EngagePro-specific questions** using Retrieval-Augmented Generation (RAG) and responds to **general or technical questions** using information retrieved from Wikipedia before generating a natural language response.
 
@@ -39,55 +39,58 @@ The chatbot combines:
 
 ```
                          User
-                           │
-                           ▼
+                           |
+                           v
+                       main.py
+                           |
+                           v
                      Streamlit UI
-                           │
-                           ▼
-                   LangGraph Workflow
-                           │
-                           ▼
-                  Safety Guardrail (GPT Classifier)
-                    ┌────────┴────────┐
-                    │                 │
-                    ▼                 ▼
-             Blocked Response    Routing Agent (GPT Classifier)
-                                      │
-                          ┌───────────┴───────────┐
-                          ▼                       ▼
-                EngagePro Questions      General Questions
-                          │                       │
-                          ▼                       ▼
-                    ChromaDB (RAG)         Wikipedia API
-                          │                       │
-                          ▼                       ▼
-                   Prompt Builder         Prompt Builder
-                          └───────────────┬───────────────┘
-                                          ▼
-                                       GPT-4.1
-                                          │
-                                          ▼
-                                    Final Response
+                           |
+                           v
+                  LangGraph Workflow
+                           |
+                           v
+                Safety Guardrail
+                  /             \
+                 v               v
+       Blocked Response     Routing Agent
+                              /       \
+                             v         v
+                      EngagePro      General
+                          |             |
+                          v             v
+                       ChromaDB     Wikipedia
+                          |             |
+                          v             v
+                    Prompt Builder Prompt Builder
+                          \             /
+                           \           /
+                            v         v
+                              GPT-4.1
+                                 |
+                                 v
+                           Final Response
+
 ```
----
 
 ## Project Structure
 ```
 engagepro_chatbot/
 │
-├── app.py # Streamlit application
-├── config.py # Configuration
-├── graph/ # LangGraph workflow and nodes
-├── guardrails/ # Safety classifier
-├── llm/ # LLM factory
-├── prompts/ # Prompt templates
-├── rag/ # RAG pipeline and ChromaDB retrieval
-├── routing/ # Question routing agent
-├── wiki/ # Wikipedia retrieval
-├── scripts/ # Development and testing scripts
-├── tests/ # Unit tests
-├── docs/ # Project documentation
-├── data/ # Brochure and vector database
+├── main.py              # Application entry point
+├── app.py               # Streamlit user interface
+├── config.py            # Project configuration
+├── graph/               # LangGraph workflow, state and nodes
+├── guardrails/          # Safety classification
+├── llm/                 # LLM factory
+├── prompts/             # Prompt templates
+├── rag/                 # Retrieval-Augmented Generation
+├── routing/             # Question routing
+├── wiki/                # Wikipedia retrieval
+├── scripts/             # Development and testing scripts
+├── tests/               # Unit tests
+├── docs/                # Documentation
+├── data/                # Brochure and vector database
 └── requirements.txt
 ```
 
@@ -99,7 +102,7 @@ engagepro_chatbot/
 |----------|------------|
 | Programming Language | Python 3.11 |
 | User Interface | Streamlit |
-| LLM | OpenAI GPT-4.1 |
+| LLM | OpenAI GPT-4.1 / GPT-4o-mini|
 | Framework | LangChain |
 | Workflow | LangGraph |
 | Vector Database | ChromaDB |
@@ -145,10 +148,17 @@ OPENAI_API_KEY=your_api_key_here
 
 ## Running the Application
 
+1. Activate the project virtual environment.
+
+2. Install the required packages (if necessary):
+
+```bash
+pip install -r requirements.txt
+```
 Launch the chatbot:
 
 ```bash
-streamlit run app.py
+python main.py
 ```
 
 ---

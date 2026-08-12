@@ -12,7 +12,8 @@ def build_rag_prompt(
     """
     Build a grounded prompt using retrieved brochure content.
     """
-
+   # The retrieved documents are concatenated into a single context string, 
+   # which is then used to construct the prompt for the language model.
     context = "\n\n".join(
         doc.page_content
         for doc in documents

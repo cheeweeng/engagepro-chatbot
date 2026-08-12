@@ -7,7 +7,7 @@ the chatbot workflow.
 
 from llm.llm_factory import get_llm
 
-
+# perform the classification using the LLM and prompt
 def classify_safety(question: str) -> str:
     """
     Classify a question as either:
@@ -17,7 +17,7 @@ def classify_safety(question: str) -> str:
     blocked
     """
 
-    llm = get_llm()
+    llm = get_llm(tier="fast") # directing safety classification to gpt-4o-mini.
 
     prompt = f"""
 You are a safety classifier.

@@ -19,7 +19,7 @@ def classify_question(question: str) -> str:
         "general"
     """
 
-    llm = get_llm()
+    llm = get_llm(tier="fast")  # directing intent routing to gpt-4o-mini.
 
     prompt = f"""
 You are an intent classifier.

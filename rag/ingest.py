@@ -1,9 +1,9 @@
 """
 Load the EngagePro brochure.
 
-This script is responsible for reading the PDF document.
-Further processing (chunking, embeddings, vector storage)
-will be added in later iterations.
+This script is responsible for reading the PDF document,
+and convert its pages into LangChain Document objects.
+Chunking, embeddings, vector storage and retrieval are handled by separate modules.
 """
 
 from pathlib import Path
@@ -21,18 +21,20 @@ def load_documents() -> list[Document]:
         list[Document]: The pages extracted from the brochure.
     """
 
+    # Check if the brochure file exists. If not, raise an error.
     if not BROCHURE_FILE.exists():
         raise FileNotFoundError(
                 f"PDF not found: {BROCHURE_FILE}"
     )
 
+    # Load the PDF using PyPDFLoader, which reads the PDF and splits it into individual pages.
     loader = PyPDFLoader(str(BROCHURE_FILE))
 
     documents = loader.load()
 
     return documents
 
-
+# development/inspection utility
 def inspect_documents(documents: list[Document]) -> None:
     """
     Display information about the loaded documents.
@@ -59,6 +61,7 @@ def inspect_documents(documents: list[Document]) -> None:
 
     print(documents[0].metadata)
 
+# Developer inspection of PDF extraction
 if __name__ == "__main__":
 
     documents = load_documents()

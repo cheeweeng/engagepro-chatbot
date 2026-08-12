@@ -29,9 +29,11 @@ CHROMA_DB_DIR = VECTORSTORE_ROOT / "chroma"
 
 LLM_PROVIDER = "openai"
 
-MODEL_NAME = "gpt-4.1"
+MODEL_NAME = "gpt-4.1" # reasoning model for response generation
 
 TEMPERATURE = 0.2
+
+FAST_MODEL_NAME = "gpt-4o-mini" # for Safety checks and query intent classification
 
 # ------------------------------------------------------------------
 # Embeddings
