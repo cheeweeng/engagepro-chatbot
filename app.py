@@ -1,5 +1,5 @@
 """
-Main Streamlit application.
+Streamlit user interface and bridge to the LangGraph workflow.
 """
 
 import streamlit as st
@@ -32,7 +32,9 @@ with st.sidebar:
     st.info("0.2")
 
 # -----------------------------
-# Session State
+# Streamlit Session State
+# preserve the conversation history while Streamlit reruns the application
+# Without session state, the application would lose the conversation history between reruns.
 # -----------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -43,11 +45,11 @@ if "messages" not in st.session_state:
 for message in st.session_state.messages:
 
     if isinstance(message, HumanMessage):
-        with st.chat_message("user"):
+        with st.chat_message("user"):       # display the user message in the chat interface
             st.write(message.content)
 
     elif isinstance(message, AIMessage):
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant"):  # display the assistant message in the chat interface
             st.write(message.content)
 
 # -----------------------------
@@ -84,14 +86,14 @@ if prompt := st.chat_input("Ask me anything..."):
     )
 
     # Stream assistant response to UI in real time
-    # st.write_stream() is a custom Streamlit component that streams output tokens to the UI as they are generated.
+    # st.write_stream() displays streamed output in the Streamlit UI,
     # providing a fluid, real-time typing effect.
     with st.chat_message("assistant"):
         response_text = st.write_stream(
             generate_response_stream(st.session_state.messages)
         )
 
-    # Save assistant message to session state
+    # Save assistant message to session state after streaming is complete (conversation history is preserved)
     st.session_state.messages.append(
         AIMessage(content=response_text)
     )
