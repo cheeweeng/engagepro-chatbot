@@ -63,7 +63,7 @@ def generate_response_stream(messages: list):
     """
     for event, metadata in graph.stream({"messages": messages}, stream_mode="messages"):
         node = metadata.get("langgraph_node", "")
-        if node in ("rag_chat", "general_chat", "blocked") and event.content:
+        if node in ("rag_chat", "general_chat", "direct_chat", "blocked") and event.content:
             # LLM streaming node -> yield token chunks (AIMessageChunk)
             if isinstance(event, AIMessageChunk):
                 yield event.content

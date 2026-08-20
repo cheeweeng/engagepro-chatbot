@@ -15,3 +15,4 @@ class ChatState(MessagesState):
 
     route: str = ""
     safety: str = ""
+    standalone_query: str = ""

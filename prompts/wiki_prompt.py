@@ -5,10 +5,20 @@ Prompt builder for Wikipedia responses.
 def build_wiki_prompt(
     question: str,
     wikipedia_summary: str,
+    history: str = "",
 ) -> str:
     """
-    Build a prompt to answer a general question using Wikipedia information.
+    Build a prompt using Wikipedia information and optional conversation history.
     """
+
+    history_section = ""
+    if history.strip():
+        history_section = f"""
+Conversation History
+--------------------
+
+{history.strip()}
+"""
 
     return f"""
 You are EngagePro's AI customer support assistant.
@@ -22,7 +32,7 @@ Be friendly,
 professional,
 clear,
 and concise.
-
+{history_section}
 Wikipedia Information
 ---------------------
 

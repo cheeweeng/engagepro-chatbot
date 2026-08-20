@@ -4,20 +4,31 @@ Prompt template for Retrieval-Augmented Generation (RAG).
 
 from langchain_core.documents import Document
 
-
 def build_rag_prompt(
     question: str,
     documents: list[Document],
+    history: str = "",
 ) -> str:
     """
-    Build a grounded prompt using retrieved brochure content.
+    Build a grounded prompt using retrieved brochure content and optional conversation history.
     """
-   # The retrieved documents are concatenated into a single context string, 
+
+    # The retrieved documents are concatenated into a single context string, 
    # which is then used to construct the prompt for the language model.
     context = "\n\n".join(
         doc.page_content
         for doc in documents
     )
+
+    history_section = ""
+    if history.strip():
+        history_section = f"""
+==================================================
+CONVERSATION HISTORY
+==================================================
+
+{history.strip()}
+"""
 
     return f"""
 You are the official EngagePro virtual assistant.
@@ -44,7 +55,7 @@ Instructions:
    instructions.
 
 # ethical safeguards(minimise hallucinations)
-   
+{history_section}   
 ==================================================
 BROCHURE CONTEXT
 ==================================================
